@@ -1,0 +1,174 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Git Manager - iPad</title>
+    <link rel="stylesheet" href="styles.css">
+    <link rel="icon" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'><text y='75' font-size='75'>📱</text></svg>">
+</head>
+<body>
+    <div class="app-container">
+        <!-- Header -->
+        <header class="app-header">
+            <div class="header-content">
+                <h1>📱 Git Manager</h1>
+                <div class="header-actions">
+                    <button id="settingsBtn" class="btn-icon" title="Settings">⚙️</button>
+                    <button id="aboutBtn" class="btn-icon" title="About">ℹ️</button>
+                </div>
+            </div>
+        </header>
+
+        <!-- Main Content -->
+        <main class="app-main">
+            <!-- Tab Navigation -->
+            <nav class="tab-nav">
+                <button class="tab-btn active" data-tab="repositories">📂 Repositories</button>
+                <button class="tab-btn" data-tab="files">📄 Files</button>
+                <button class="tab-btn" data-tab="operations">⚡ Operations</button>
+            </nav>
+
+            <!-- Tab 1: Repositories -->
+            <section id="repositories" class="tab-content active">
+                <div class="section-header">
+                    <h2>My Repositories</h2>
+                    <button id="newRepoBtn" class="btn-primary">+ New Repo</button>
+                </div>
+
+                <div class="repo-list" id="repoList">
+                    <!-- Repos akan dimuat di sini -->
+                </div>
+            </section>
+
+            <!-- Tab 2: Files -->
+            <section id="files" class="tab-content">
+                <div class="section-header">
+                    <h2>File Manager</h2>
+                    <button id="uploadFilesBtn" class="btn-primary">📤 Upload Files</button>
+                </div>
+
+                <div class="file-browser">
+                    <div class="breadcrumb" id="breadcrumb">Root</div>
+                    <div class="file-list" id="fileList">
+                        <!-- Files akan dimuat di sini -->
+                    </div>
+                </div>
+            </section>
+
+            <!-- Tab 3: Operations -->
+            <section id="operations" class="tab-content">
+                <div class="section-header">
+                    <h2>Git Operations</h2>
+                </div>
+
+                <div class="operations-panel">
+                    <!-- Repo Selection -->
+                    <div class="form-group">
+                        <label>Select Repository:</label>
+                        <select id="opRepoSelect" class="form-control">
+                            <option value="">-- Select Repo --</option>
+                        </select>
+                    </div>
+
+                    <!-- Commit Message -->
+                    <div class="form-group">
+                        <label>Commit Message:</label>
+                        <textarea id="commitMessage" class="form-control" placeholder="Enter commit message..."></textarea>
+                    </div>
+
+                    <!-- Git Operations -->
+                    <div class="operations-buttons">
+                        <button id="pullBtn" class="btn btn-info">⬇️ Pull</button>
+                        <button id="statusBtn" class="btn btn-warning">📊 Status</button>
+                        <button id="pushBtn" class="btn btn-success">⬆️ Push</button>
+                    </div>
+
+                    <!-- Changes Display -->
+                    <div class="changes-panel">
+                        <h3>Changes</h3>
+                        <div id="changesList" class="changes-list">
+                            <!-- Changes akan ditampilkan di sini -->
+                        </div>
+                    </div>
+                </div>
+            </section>
+        </main>
+    </div>
+
+    <!-- Modal: Clone Repo -->
+    <div id="cloneModal" class="modal">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h2>Clone Repository</h2>
+                <button class="modal-close">&times;</button>
+            </div>
+            <div class="modal-body">
+                <div class="form-group">
+                    <label>Repository URL:</label>
+                    <input type="text" id="cloneUrl" class="form-control" placeholder="https://github.com/user/repo.git">
+                </div>
+                <div class="form-group">
+                    <label>Branch (optional):</label>
+                    <input type="text" id="cloneBranch" class="form-control" placeholder="main">
+                </div>
+                <div class="form-group">
+                    <label>Personal Access Token (PAT):</label>
+                    <input type="password" id="clonePAT" class="form-control" placeholder="Your GitHub PAT">
+                </div>
+            </div>
+            <div class="modal-footer">
+                <button class="btn btn-secondary" data-dismiss="modal">Cancel</button>
+                <button id="cloneConfirmBtn" class="btn btn-primary">Clone</button>
+            </div>
+        </div>
+    </div>
+
+    <!-- Modal: Settings -->
+    <div id="settingsModal" class="modal">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h2>Settings</h2>
+                <button class="modal-close">&times;</button>
+            </div>
+            <div class="modal-body">
+                <div class="form-group">
+                    <label>Default Git Name:</label>
+                    <input type="text" id="gitName" class="form-control" placeholder="Your Name">
+                </div>
+                <div class="form-group">
+                    <label>Default Git Email:</label>
+                    <input type="email" id="gitEmail" class="form-control" placeholder="your@email.com">
+                </div>
+                <div class="form-group">
+                    <label>Personal Access Token:</label>
+                    <input type="password" id="gitPAT" class="form-control" placeholder="Your GitHub PAT">
+                </div>
+                <div class="form-group checkbox">
+                    <input type="checkbox" id="autoSync" checked>
+                    <label>Auto sync on changes</label>
+                </div>
+            </div>
+            <div class="modal-footer">
+                <button class="btn btn-secondary" data-dismiss="modal">Close</button>
+                <button id="saveSettingsBtn" class="btn btn-primary">Save Settings</button>
+            </div>
+        </div>
+    </div>
+
+    <!-- Loading Spinner -->
+    <div id="loadingSpinner" class="loading-spinner">
+        <div class="spinner"></div>
+        <p id="loadingText">Loading...</p>
+    </div>
+
+    <!-- Toast Notifications -->
+    <div id="toast" class="toast"></div>
+
+    <script src="js/api.js"></script>
+    <script src="js/gitManager.js"></script>
+    <script src="js/ui.js"></script>
+    <script src="js/fileManager.js"></script>
+    <script src="js/app.js"></script>
+</body>
+</html>
