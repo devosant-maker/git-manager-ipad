@@ -209,3 +209,51 @@ function formatDate(date) {
         minute: '2-digit'
     });
 }
+
+/**
+ * Initialize all button event listeners with error handling
+ */
+function initializeButtonListeners() {
+    console.log('🔧 Initializing button listeners...');
+
+    // Refresh Button
+    const refreshBtn = document.getElementById('refreshBtn');
+    if (refreshBtn) {
+        refreshBtn.addEventListener('click', (e) => {
+            e.preventDefault();
+            console.log('✅ Refresh button clicked');
+            handleRefresh();
+        });
+        console.log('✅ Refresh button listener added');
+    } else {
+        console.warn('❌ Refresh button not found');
+    }
+
+    // Switch Account Button
+    const switchAccountBtn = document.getElementById('switchAccountBtn');
+    if (switchAccountBtn) {
+        switchAccountBtn.addEventListener('click', (e) => {
+            e.preventDefault();
+            console.log('✅ Switch Account button clicked');
+            handleSwitchAccount();
+        });
+        console.log('✅ Switch Account button listener added');
+    } else {
+        console.warn('❌ Switch Account button not found');
+    }
+
+    // Logout Button
+    const logoutBtn = document.getElementById('logoutBtn');
+    if (logoutBtn) {
+        logoutBtn.addEventListener('click', (e) => {
+            e.preventDefault();
+            console.log('✅ Logout button clicked');
+            handleLogout();
+        });
+        console.log('✅ Logout button listener added');
+    } else {
+        console.warn('❌ Logout button not found');
+    }
+
+    console.log('✅ All button listeners initialized');
+}
