@@ -211,6 +211,20 @@ body {
     background-color: #d1d5da;
 }
 
+.btn-danger {
+    background-color: var(--danger-color);
+    color: white;
+}
+
+.btn-danger:hover {
+    background-color: #c82333;
+}
+
+.btn-sm {
+    padding: 0.375rem 0.75rem;
+    font-size: 0.85rem;
+}
+
 /* Repository List */
 .repo-list {
     display: grid;
@@ -384,6 +398,20 @@ textarea.form-control {
 .operations-buttons .btn {
     width: 100%;
     justify-content: center;
+}
+
+/* Account Info */
+.account-info {
+    background-color: var(--light-bg);
+    border: 1px solid var(--border-color);
+    border-radius: 6px;
+    padding: 1rem;
+}
+
+.account-info p {
+    margin: 0;
+    font-weight: 500;
+    color: var(--dark-text);
 }
 
 /* Changes Panel */
@@ -662,6 +690,15 @@ textarea.form-control {
 
     .repo-card {
         padding: 1rem;
+    }
+
+    .header-actions {
+        gap: 0.25rem;
+    }
+
+    .btn-icon {
+        padding: 0.375rem;
+        font-size: 1rem;
     }
 }
 
