@@ -21,6 +21,11 @@ async function initializeApp() {
     // Setup event listeners
     setupEventListeners();
 
+    // Initialize button listeners (FIX untuk bug tombol)
+    setTimeout(() => {
+        initializeButtonListeners();
+    }, 100);
+
     // Load repositories
     await loadAndRenderRepositories();
 }
@@ -29,6 +34,8 @@ async function initializeApp() {
  * Setup all event listeners
  */
 function setupEventListeners() {
+    console.log('📌 Setting up main event listeners...');
+
     // Tab navigation
     document.querySelectorAll('.tab-btn').forEach(btn => {
         btn.addEventListener('click', (e) => {
@@ -38,39 +45,55 @@ function setupEventListeners() {
     });
 
     // Main action buttons
-    document.getElementById('newRepoBtn').addEventListener('click', () => {
-        openModal('cloneModal');
-    });
+    const newRepoBtn = document.getElementById('newRepoBtn');
+    if (newRepoBtn) {
+        newRepoBtn.addEventListener('click', () => {
+            openModal('cloneModal');
+        });
+    }
 
-    document.getElementById('uploadFilesBtn').addEventListener('click', () => {
-        handleFileUpload();
-    });
+    const uploadFilesBtn = document.getElementById('uploadFilesBtn');
+    if (uploadFilesBtn) {
+        uploadFilesBtn.addEventListener('click', () => {
+            handleFileUpload();
+        });
+    }
 
-    document.getElementById('pullBtn').addEventListener('click', () => {
-        handlePull();
-    });
+    const pullBtn = document.getElementById('pullBtn');
+    if (pullBtn) {
+        pullBtn.addEventListener('click', () => {
+            handlePull();
+        });
+    }
 
-    document.getElementById('pushBtn').addEventListener('click', () => {
-        handlePush();
-    });
+    const pushBtn = document.getElementById('pushBtn');
+    if (pushBtn) {
+        pushBtn.addEventListener('click', () => {
+            handlePush();
+        });
+    }
 
-    document.getElementById('statusBtn').addEventListener('click', () => {
-        handleStatus();
-    });
-
-    // Refresh button
-    document.getElementById('refreshBtn').addEventListener('click', () => {
-        handleRefresh();
-    });
+    const statusBtn = document.getElementById('statusBtn');
+    if (statusBtn) {
+        statusBtn.addEventListener('click', () => {
+            handleStatus();
+        });
+    }
 
     // Settings and About
-    document.getElementById('settingsBtn').addEventListener('click', () => {
-        openModal('settingsModal');
-    });
+    const settingsBtn = document.getElementById('settingsBtn');
+    if (settingsBtn) {
+        settingsBtn.addEventListener('click', () => {
+            openModal('settingsModal');
+        });
+    }
 
-    document.getElementById('aboutBtn').addEventListener('click', () => {
-        showToast('🚀 Git Manager v1.0 - Manage your repos on iPad', 'info', 5000);
-    });
+    const aboutBtn = document.getElementById('aboutBtn');
+    if (aboutBtn) {
+        aboutBtn.addEventListener('click', () => {
+            showToast('🚀 Git Manager v1.0 - Manage your repos on iPad', 'info', 5000);
+        });
+    }
 
     // Modal close buttons
     document.querySelectorAll('.modal-close').forEach(btn => {
@@ -92,32 +115,34 @@ function setupEventListeners() {
     });
 
     // Clone modal
-    document.getElementById('cloneConfirmBtn').addEventListener('click', () => {
-        handleCloneRepository();
-    });
+    const cloneConfirmBtn = document.getElementById('cloneConfirmBtn');
+    if (cloneConfirmBtn) {
+        cloneConfirmBtn.addEventListener('click', () => {
+            handleCloneRepository();
+        });
+    }
 
     // Settings save
-    document.getElementById('saveSettingsBtn').addEventListener('click', () => {
-        saveSettings();
-    });
-
-    // Account switcher
-    document.getElementById('switchAccountBtn').addEventListener('click', () => {
-        handleSwitchAccount();
-    });
-
-    document.getElementById('logoutBtn').addEventListener('click', () => {
-        handleLogout();
-    });
+    const saveSettingsBtn = document.getElementById('saveSettingsBtn');
+    if (saveSettingsBtn) {
+        saveSettingsBtn.addEventListener('click', () => {
+            saveSettings();
+        });
+    }
 
     // Operations repo select
-    document.getElementById('opRepoSelect').addEventListener('change', (e) => {
-        const repoFullName = e.target.value;
-        if (repoFullName) {
-            const [owner, repo] = repoFullName.split('/');
-            selectRepository(owner, repo);
-        }
-    });
+    const opRepoSelect = document.getElementById('opRepoSelect');
+    if (opRepoSelect) {
+        opRepoSelect.addEventListener('change', (e) => {
+            const repoFullName = e.target.value;
+            if (repoFullName) {
+                const [owner, repo] = repoFullName.split('/');
+                selectRepository(owner, repo);
+            }
+        });
+    }
+
+    console.log('✅ Main event listeners setup complete');
 }
 
 /**
@@ -151,6 +176,7 @@ function switchTab(tabName) {
  * Handle refresh button
  */
 async function handleRefresh() {
+    console.log('🔄 Refresh clicked');
     showLoading(true, 'Refreshing repositories...');
     try {
         await loadAndRenderRepositories();
@@ -360,6 +386,8 @@ async function handleStatus() {
  * Handle account switch
  */
 function handleSwitchAccount() {
+    console.log('🔐 Switch Account clicked');
+    
     const username = document.getElementById('githubUsername').value.trim();
     const token = document.getElementById('githubToken').value.trim();
 
@@ -393,6 +421,8 @@ function handleSwitchAccount() {
  * Handle logout
  */
 function handleLogout() {
+    console.log('👋 Logout clicked');
+    
     if (!currentGitHubAccount) {
         showToast('No account to logout from', 'warning');
         return;
@@ -461,11 +491,13 @@ function updateAccountDisplay() {
     const accountInfo = document.getElementById('currentAccount');
     const logoutBtn = document.getElementById('logoutBtn');
 
-    if (currentGitHubAccount) {
-        accountInfo.textContent = `✅ Logged in as: @${currentGitHubAccount.username}`;
-        logoutBtn.style.display = 'inline-block';
-    } else {
-        accountInfo.textContent = '❌ No account logged in';
-        logoutBtn.style.display = 'none';
+    if (accountInfo && logoutBtn) {
+        if (currentGitHubAccount) {
+            accountInfo.textContent = `✅ Logged in as: @${currentGitHubAccount.username}`;
+            logoutBtn.style.display = 'inline-block';
+        } else {
+            accountInfo.textContent = '❌ No account logged in';
+            logoutBtn.style.display = 'none';
+        }
     }
 }
