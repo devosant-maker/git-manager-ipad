@@ -14,6 +14,7 @@
             <div class="header-content">
                 <h1>📱 Git Manager</h1>
                 <div class="header-actions">
+                    <button id="refreshBtn" class="btn-icon" title="Refresh">🔄</button>
                     <button id="settingsBtn" class="btn-icon" title="Settings">⚙️</button>
                     <button id="aboutBtn" class="btn-icon" title="About">ℹ️</button>
                 </div>
@@ -132,6 +133,27 @@
                 <button class="modal-close">&times;</button>
             </div>
             <div class="modal-body">
+                <!-- Current Account Info -->
+                <div class="form-group">
+                    <label>GitHub Account:</label>
+                    <div class="account-info" id="accountInfo">
+                        <p id="currentAccount">No account logged in</p>
+                        <button type="button" class="btn btn-danger btn-sm" id="logoutBtn" style="margin-top: 0.5rem;">🚪 Logout</button>
+                    </div>
+                </div>
+
+                <!-- Switch Account Section -->
+                <div class="form-group">
+                    <label>Switch GitHub Account:</label>
+                    <input type="text" id="githubUsername" class="form-control" placeholder="GitHub username">
+                    <input type="password" id="githubToken" class="form-control" placeholder="Personal Access Token (PAT)" style="margin-top: 0.5rem;">
+                    <button type="button" class="btn btn-primary" id="switchAccountBtn" style="margin-top: 0.5rem; width: 100%;">🔐 Switch Account</button>
+                </div>
+
+                <!-- Divider -->
+                <hr style="margin: 1.5rem 0; border: none; border-top: 1px solid var(--border-color);">
+
+                <!-- Git Configuration -->
                 <div class="form-group">
                     <label>Default Git Name:</label>
                     <input type="text" id="gitName" class="form-control" placeholder="Your Name">
@@ -139,10 +161,6 @@
                 <div class="form-group">
                     <label>Default Git Email:</label>
                     <input type="email" id="gitEmail" class="form-control" placeholder="your@email.com">
-                </div>
-                <div class="form-group">
-                    <label>Personal Access Token:</label>
-                    <input type="password" id="gitPAT" class="form-control" placeholder="Your GitHub PAT">
                 </div>
                 <div class="form-group checkbox">
                     <input type="checkbox" id="autoSync" checked>
