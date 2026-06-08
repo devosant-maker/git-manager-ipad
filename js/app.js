@@ -5,6 +5,7 @@
 // Global state
 let currentRepository = null;
 let currentPath = '';
+let currentGitHubAccount = null;
 
 // Initialize app
 document.addEventListener('DOMContentLoaded', () => {
@@ -57,6 +58,11 @@ function setupEventListeners() {
         handleStatus();
     });
 
+    // Refresh button
+    document.getElementById('refreshBtn').addEventListener('click', () => {
+        handleRefresh();
+    });
+
     // Settings and About
     document.getElementById('settingsBtn').addEventListener('click', () => {
         openModal('settingsModal');
@@ -95,6 +101,15 @@ function setupEventListeners() {
         saveSettings();
     });
 
+    // Account switcher
+    document.getElementById('switchAccountBtn').addEventListener('click', () => {
+        handleSwitchAccount();
+    });
+
+    document.getElementById('logoutBtn').addEventListener('click', () => {
+        handleLogout();
+    });
+
     // Operations repo select
     document.getElementById('opRepoSelect').addEventListener('change', (e) => {
         const repoFullName = e.target.value;
@@ -129,6 +144,22 @@ function switchTab(tabName) {
     const btn = document.querySelector(`[data-tab="${tabName}"]`);
     if (btn) {
         btn.classList.add('active');
+    }
+}
+
+/**
+ * Handle refresh button
+ */
+async function handleRefresh() {
+    showLoading(true, 'Refreshing repositories...');
+    try {
+        await loadAndRenderRepositories();
+        showLoading(false);
+        showToast('Repositories refreshed! 🔄', 'success');
+    } catch (error) {
+        showLoading(false);
+        showToast('Failed to refresh repositories', 'error');
+        console.error('Refresh error:', error);
     }
 }
 
@@ -195,7 +226,7 @@ async function loadFileList(path = '') {
 async function openRepoDetails(owner, repoName) {
     try {
         const details = await gitAPI.getRepoDetails(owner, repoName);
-        alert(`Repository: ${details.full_name}\n\nDescription: ${details.description || 'N/A'}\n\nStars: ${details.stargazers_count}\nForks: ${details.forks_count}\nOpen Issues: ${details.open_issues_count}\n\nURL: ${details.html_url}`);
+        alert(`Repository: ${details.full_name}\n\nDescription: ${details.description || 'N/A'}\n\nStars: ${details.stargazers_count}\nForks: ${details.forks_count}\nOpen Issues: ${details.open_issues_count}`);
     } catch (error) {
         showToast('Failed to load repository details', 'error');
     }
@@ -326,34 +357,115 @@ async function handleStatus() {
 }
 
 /**
+ * Handle account switch
+ */
+function handleSwitchAccount() {
+    const username = document.getElementById('githubUsername').value.trim();
+    const token = document.getElementById('githubToken').value.trim();
+
+    if (!username || !token) {
+        showToast('Please enter both username and PAT', 'warning');
+        return;
+    }
+
+    // Save new account
+    localStorage.setItem('github_username', username);
+    localStorage.setItem('github_token', token);
+    
+    // Update current account
+    currentGitHubAccount = { username, token };
+    gitAPI.setToken(token);
+
+    // Update display
+    updateAccountDisplay();
+
+    // Clear inputs
+    document.getElementById('githubUsername').value = '';
+    document.getElementById('githubToken').value = '';
+
+    showToast(`✅ Switched to account: ${username}`, 'success');
+
+    // Reload repositories
+    loadAndRenderRepositories();
+}
+
+/**
+ * Handle logout
+ */
+function handleLogout() {
+    if (!currentGitHubAccount) {
+        showToast('No account to logout from', 'warning');
+        return;
+    }
+
+    // Confirm logout
+    const confirmed = confirm(`Logout from ${currentGitHubAccount.username}?`);
+    if (!confirmed) return;
+
+    // Clear account
+    localStorage.removeItem('github_username');
+    localStorage.removeItem('github_token');
+    
+    currentGitHubAccount = null;
+    gitAPI.setToken('');
+
+    // Update display
+    updateAccountDisplay();
+
+    // Clear repositories
+    renderRepositories([]);
+    updateRepoSelect([]);
+
+    showToast('👋 Logged out successfully', 'info');
+}
+
+/**
  * Load and save settings
  */
 function loadSettings() {
     const name = localStorage.getItem('git_name') || 'Git User';
     const email = localStorage.getItem('git_email') || 'user@example.com';
     const token = localStorage.getItem('github_token') || '';
+    const username = localStorage.getItem('github_username') || '';
 
     document.getElementById('gitName').value = name;
     document.getElementById('gitEmail').value = email;
-    document.getElementById('gitPAT').value = token;
+
+    // Load GitHub account info
+    if (username && token) {
+        currentGitHubAccount = { username, token };
+        gitAPI.setToken(token);
+    }
+
+    // Update account display
+    updateAccountDisplay();
 }
 
 function saveSettings() {
     const name = document.getElementById('gitName').value.trim() || 'Git User';
     const email = document.getElementById('gitEmail').value.trim() || 'user@example.com';
-    const token = document.getElementById('gitPAT').value.trim();
 
     localStorage.setItem('git_name', name);
     localStorage.setItem('git_email', email);
-    if (token) {
-        localStorage.setItem('github_token', token);
-    }
 
     gitAPI.setGitConfig(name, email);
-    if (token) {
-        gitAPI.setToken(token);
-    }
 
     closeModal('settingsModal');
     showToast('Settings saved successfully', 'success');
+}
+
+/**
+ * Update account display in settings
+ */
+function updateAccountDisplay() {
+    const accountInfo = document.getElementById('currentAccount');
+    const logoutBtn = document.getElementById('logoutBtn');
+
+    if (currentGitHubAccount) {
+        accountInfo.textContent = `✅ Logged in as: @${currentGitHubAccount.username}`;
+        logoutBtn.style.display = 'inline-block';
+    } else {
+        accountInfo.textContent = '❌ No account logged in';
+        logoutBtn.style.display = 'none';
+    }
 }
